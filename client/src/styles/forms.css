@@ -1,0 +1,525 @@
+/* Form Styles
+ * Forms, form groups, inputs, textareas, selects, and form layout patterns
+ */
+
+/* ============ FORM ============ */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form--inline {
+  flex-direction: row;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.form--inline .form-group {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+/* ============ FORM GROUP ============ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group--full {
+  width: 100%;
+}
+
+.form-group--half {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ============ FORM LABEL ============ */
+.form-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  line-height: var(--line-height-normal);
+}
+
+.form-label--required::after {
+  content: ' *';
+  color: var(--color-error);
+}
+
+.form-label--disabled {
+  color: var(--color-gray-400);
+}
+
+/* ============ INPUT WRAPPER ============ */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.input-wrapper--with-icon {
+  position: relative;
+}
+
+.input-wrapper__icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-gray-400);
+  pointer-events: none;
+  font-size: var(--font-size-lg);
+}
+
+.input-wrapper__icon--left {
+  left: var(--spacing-lg);
+}
+
+.input-wrapper__icon--right {
+  right: var(--spacing-lg);
+}
+
+/* ============ INPUTS - TEXT/EMAIL/PASSWORD/NUMBER ============ */
+.form-input {
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  color: var(--color-gray-700);
+  background-color: white;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-fast);
+  line-height: var(--line-height-normal);
+}
+
+.form-input:hover {
+  border-color: var(--color-gray-400);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-input:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+  border-color: var(--color-gray-200);
+}
+
+.form-input::placeholder {
+  color: var(--color-gray-400);
+}
+
+/* Input with Icon */
+.form-input--icon-left {
+  padding-left: 40px;
+}
+
+.form-input--icon-right {
+  padding-right: 40px;
+}
+
+/* Input Size Variants */
+.form-input--sm {
+  height: var(--input-height-sm);
+  padding: 0 var(--spacing-md);
+  font-size: var(--font-size-xs);
+}
+
+.form-input--lg {
+  height: var(--input-height-lg);
+  padding: 0 var(--spacing-xl);
+  font-size: var(--font-size-base);
+}
+
+/* Input Type Variants */
+.form-input--search {
+  padding-left: 40px;
+}
+
+.form-input--search::placeholder {
+  color: var(--color-gray-400);
+}
+
+/* Input Error State */
+.form-input--error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.form-input--error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input--error::placeholder {
+  color: var(--color-error-300);
+}
+
+/* ============ TEXTAREA ============ */
+.form-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  color: var(--color-gray-700);
+  background-color: white;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  outline: none;
+  resize: vertical;
+  transition: all var(--transition-fast);
+  line-height: var(--line-height-normal);
+}
+
+.form-textarea:hover {
+  border-color: var(--color-gray-400);
+}
+
+.form-textarea:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-textarea:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+  border-color: var(--color-gray-200);
+}
+
+.form-textarea::placeholder {
+  color: var(--color-gray-400);
+}
+
+/* Textarea Size Variants */
+.form-textarea--sm {
+  min-height: 80px;
+}
+
+.form-textarea--lg {
+  min-height: 160px;
+}
+
+/* Textarea Error State */
+.form-textarea--error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.form-textarea--error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* ============ SELECT ============ */
+.form-select {
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  color: var(--color-gray-700);
+  background-color: white;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6l4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-lg) center;
+  background-size: 20px;
+  padding-right: 40px;
+  transition: all var(--transition-fast);
+  line-height: var(--line-height-normal);
+}
+
+.form-select:hover {
+  border-color: var(--color-gray-400);
+}
+
+.form-select:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-select:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+  border-color: var(--color-gray-200);
+}
+
+/* Select Size Variants */
+.form-select--sm {
+  height: var(--input-height-sm);
+  padding: 0 var(--spacing-md);
+  padding-right: 36px;
+  font-size: var(--font-size-xs);
+}
+
+.form-select--lg {
+  height: var(--input-height-lg);
+  padding: 0 var(--spacing-xl);
+  padding-right: 44px;
+  font-size: var(--font-size-base);
+}
+
+/* Select Error State */
+.form-select--error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.form-select--error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* ============ CHECKBOX & RADIO ============ */
+.form-checkbox,
+.form-radio {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-primary-600);
+}
+
+.form-checkbox:disabled,
+.form-radio:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.form-checkbox-group,
+.form-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.form-checkbox-item,
+.form-radio-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  user-select: none;
+}
+
+.form-checkbox-item input:disabled,
+.form-radio-item input:disabled {
+  cursor: not-allowed;
+}
+
+.form-checkbox-label,
+.form-radio-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  cursor: pointer;
+}
+
+.form-checkbox-item input:disabled ~ .form-checkbox-label,
+.form-radio-item input:disabled ~ .form-radio-label {
+  color: var(--color-gray-400);
+}
+
+/* ============ FORM HELP TEXT ============ */
+.form-help-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin-top: var(--spacing-xs);
+  line-height: var(--line-height-snug);
+}
+
+.form-help-text--error {
+  color: var(--color-error);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.form-help-text--success {
+  color: var(--color-success);
+}
+
+.form-help-text--warning {
+  color: var(--color-warning);
+}
+
+/* ============ FORM FIELD ============ */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-field--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.form-field--inline .form-label {
+  margin-bottom: 0;
+  min-width: 150px;
+}
+
+.form-field--inline .form-input,
+.form-field--inline .form-select,
+.form-field--inline .form-textarea {
+  flex: 1;
+}
+
+.form-field--error .form-label {
+  color: var(--color-error);
+}
+
+.form-field--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ============ FORM ACTIONS ============ */
+.form-actions {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-2xl);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.form-actions--center {
+  justify-content: center;
+}
+
+.form-actions--spread {
+  justify-content: space-between;
+}
+
+.form-actions--left {
+  justify-content: flex-start;
+}
+
+/* ============ FORM SECTIONS ============ */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.form-section:last-child {
+  border-bottom: none;
+}
+
+.form-section__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.form-section__description {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  margin: 0;
+}
+
+/* ============ FORM COLUMNS ============ */
+.form-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-2xl);
+}
+
+.form-columns--1 {
+  grid-template-columns: 1fr;
+}
+
+.form-columns--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ============ RESPONSIVE FORMS ============ */
+@media (max-width: 768px) {
+  .form--inline {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .form--inline .form-group {
+    width: 100%;
+  }
+
+  .form-field--inline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-field--inline .form-label {
+    min-width: auto;
+  }
+
+  .form-columns {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .form-actions {
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .form-section {
+    padding: var(--spacing-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .form {
+    gap: var(--spacing-md);
+  }
+
+  .form-group {
+    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-xs);
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .form-actions {
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-lg);
+  }
+
+  .form-section {
+    padding: var(--spacing-lg);
+  }
+
+  .form-section__title {
+    font-size: var(--font-size-base);
+  }
+}

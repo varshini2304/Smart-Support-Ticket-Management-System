@@ -5,12 +5,37 @@ import { isDBConnected } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import logger from './utils/logger.js';
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  // Skip verbose per-request HTTP logs during automated tests unless DEBUG is set
+  if (process.env.NODE_ENV === 'test' && !process.env.DEBUG) {
+    return next();
+  }
+
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const status = res.statusCode;
+    const msg = `HTTP ${req.method} ${req.originalUrl || req.url} ${status} (${duration}ms)`;
+    if (status >= 500) {
+      logger.error(msg);
+    } else if (status >= 400) {
+      logger.warn(msg);
+    } else {
+      logger.info(msg);
+    }
+  });
+
+  next();
+});
 
 // Health check endpoint with database status
 app.get('/api/health', (req, res) => {
@@ -37,6 +62,9 @@ app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use((req, res) => {
+  if (process.env.NODE_ENV !== 'test' || process.env.DEBUG) {
+    logger.warn(`404 Not Found: ${req.method} ${req.originalUrl || req.url}`);
+  }
   res.status(404).json({
     error: 'Not Found',
     message: 'The requested endpoint does not exist.',
@@ -45,7 +73,7 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
+  logger.error(`Unhandled error on ${req.method} ${req.originalUrl || req.url}: ${err.message}`);
   res.status(500).json({
     error: 'Internal Server Error',
     message: err.message || 'An unexpected error occurred.',

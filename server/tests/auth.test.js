@@ -171,7 +171,7 @@ describe('POST /api/auth/register - User Registration', () => {
     const response = await request(app).post('/api/auth/register').send({
       name: 'John Customer',
       email: 'john@example.com',
-      password: 'Short123',
+      password: 'Short12',
     });
 
     expect(response.status).toBe(400);

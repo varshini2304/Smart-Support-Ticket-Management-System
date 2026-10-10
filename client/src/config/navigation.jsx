@@ -8,6 +8,8 @@ import {
   TicketsIcon,
   CreateTicketIcon,
   ProfileIcon,
+  UsersIcon,
+  ReportsIcon,
 } from "../components/icons/NavIcons";
 
 export const customerNavItems = [
@@ -16,12 +18,6 @@ export const customerNavItems = [
     label: "Dashboard",
     path: "/dashboard",
     icon: <DashboardIcon />,
-  },
-  {
-    id: "create",
-    label: "Create Ticket",
-    path: "/tickets/create",
-    icon: <CreateTicketIcon />,
   },
   {
     id: "tickets",
@@ -47,13 +43,31 @@ export const adminNavItems = [
   {
     id: "tickets",
     label: "All Tickets",
-    path: "/admin/dashboard",
+    path: "/admin/tickets",
     icon: <TicketsIcon />,
+  },
+  {
+    id: "assigned",
+    label: "Assigned Tickets",
+    path: "/admin/assigned-tickets",
+    icon: <TicketsIcon />,
+  },
+  {
+    id: "users",
+    label: "Users",
+    path: "/admin/users",
+    icon: <UsersIcon />,
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    path: "/admin/reports",
+    icon: <ReportsIcon />,
   },
   {
     id: "profile",
     label: "Profile",
-    path: "/profile",
+    path: "/admin/profile",
     icon: <ProfileIcon />,
   },
 ];

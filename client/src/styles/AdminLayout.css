@@ -1,0 +1,85 @@
+/* ==========================================================================
+   AdminLayout.css - Shared Administrator Dashboard Layout Architecture
+   ========================================================================== */
+
+:root {
+  --admin-sidebar-width: 275px;
+  --admin-header-height: 70px;
+  --admin-bg-color: #f8fafc;
+  --admin-text-main: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-border-color: #e2e8f0;
+  --admin-primary-blue: #2563eb;
+  --admin-primary-hover: #1d4ed8;
+  --admin-primary-light: #eff6ff;
+  --admin-card-bg: #ffffff;
+  --admin-card-radius: 14px;
+  --admin-card-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --admin-card-shadow-hover: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+}
+
+/* Master container */
+.admin-layout-root {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--admin-bg-color);
+  color: var(--admin-text-main);
+  font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Main content wrapper containing topbar and page outlet */
+.admin-layout-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--admin-sidebar-width);
+  min-height: 100vh;
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--admin-bg-color);
+}
+
+/* Scrollable page content area */
+.admin-layout-content {
+  flex: 1;
+  padding: 1.75rem 2rem 3rem 2rem;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Mobile backdrop */
+.admin-sidebar-backdrop {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .admin-layout-main {
+    margin-left: 0;
+  }
+
+  .admin-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .admin-sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .admin-layout-content {
+    padding: 1.25rem 1rem 2rem 1rem;
+  }
+}

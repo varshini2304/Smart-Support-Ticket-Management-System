@@ -1,7 +1,3 @@
-/**
- * CreateTicketModal - Modal Popup Component
- * Appears as overlay on top of existing page
- */
 
 import { useState } from 'react';
 import { ticketAPI } from '../services/api';

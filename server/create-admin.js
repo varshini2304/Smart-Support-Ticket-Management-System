@@ -1,60 +1,72 @@
-#!/usr/bin/env node
-
-/**
- * Script to create an admin user
- * Usage: node create-admin.js
- */
-
-import mongoose from "mongoose";
-import { createUser } from "./src/services/authService.js";
-import User from "./src/models/User.js";
-import { connectDB } from "./src/config/db.js";
 import "dotenv/config";
+import mongoose from "mongoose";
+import User from "./src/models/User.js";
+import { hashPassword } from "./src/services/authService.js";
+import { connectDB } from "./src/config/db.js";
 
-async function createAdminUser() {
-  try {
-    console.log("🔗 Connecting to MongoDB...");
-    await connectDB();
+async function upsertAdminUser(name, email, password) {
+  const normalizedEmail = email.trim().toLowerCase();
 
-    const adminEmail = "admin@ticketsystem.com";
-    const adminPassword = "admin123";
+  if (!password || password.length < 8) {
+    throw new Error(`Password for ${normalizedEmail} must be at least 8 characters.`);
+  }
 
-    // Check if admin already exists and delete old one
-    const existingAdmin = await User.findOne({ email: adminEmail });
-    if (existingAdmin) {
-      console.log("ℹ️  Existing admin found. Deleting old admin user...");
-      await User.findByIdAndDelete(existingAdmin._id);
-      console.log("✅ Old admin deleted");
-    }
+  const existingUser = await User.findOne({ email: normalizedEmail });
+  const passwordHash = await hashPassword(password);
 
-    console.log("👤 Creating admin user...");
-
-    // Create admin user (initially as CUSTOMER due to createUser logic)
-    const adminUser = await createUser(
-      "System Administrator",
-      adminEmail,
-      adminPassword,
-    );
-
-    // Update role to ADMIN
-    await User.findByIdAndUpdate(adminUser._id, { role: "ADMIN" });
-
-    console.log("✅ Admin user created successfully!");
-    console.log("📧 Email:", adminEmail);
-    console.log("🔒 Password:", adminPassword);
-    console.log("👑 Role: ADMIN");
-    console.log("");
-    console.log("🌐 You can now login at: http://localhost:5173/login");
-    console.log("🏛️  Admin dashboard: http://localhost:5173/admin/dashboard");
-  } catch (error) {
-    console.error("❌ Error creating admin user:", error.message);
-    process.exit(1);
-  } finally {
-    console.log("🔌 Disconnecting from MongoDB...");
-    await mongoose.disconnect();
-    console.log("✅ Done!");
+  if (existingUser) {
+    existingUser.role = "ADMIN";
+    existingUser.name = name || existingUser.name;
+    existingUser.passwordHash = passwordHash;
+    await existingUser.save();
+    console.log(`✓ Existing account updated to Administrator: ${normalizedEmail}`);
+    return existingUser;
+  } else {
+    const newUser = await User.create({
+      name: name || "System Administrator",
+      email: normalizedEmail,
+      passwordHash,
+      role: "ADMIN",
+    });
+    console.log(`✓ New Administrator account created: ${normalizedEmail}`);
+    return newUser;
   }
 }
 
-// Run the script
-createAdminUser();
+async function run() {
+  try {
+    await connectDB();
+
+    // 1. Create or update admin from .env if specified
+    const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const envPassword = process.env.ADMIN_PASSWORD;
+
+    if (envEmail && envPassword) {
+      await upsertAdminUser("System Administrator", envEmail, envPassword);
+    }
+
+    // 2. Also ensure standard admin@supporthub.com exists as a primary administrator account
+    const standardEmail = "admin@supporthub.com";
+    const standardPassword = envPassword || "admin123";
+    if (standardEmail !== envEmail) {
+      await upsertAdminUser("SupportHub Admin", standardEmail, standardPassword);
+    }
+
+    console.log("\n========================================");
+    console.log("Admin accounts ready in database:");
+    if (envEmail) {
+      console.log(`• Email: ${envEmail} | Password: ${envPassword}`);
+    }
+    if (standardEmail !== envEmail) {
+      console.log(`• Email: ${standardEmail} | Password: ${standardPassword}`);
+    }
+    console.log("========================================\n");
+  } finally {
+    await mongoose.disconnect();
+  }
+}
+
+run().catch((error) => {
+  console.error("✗ Admin creation failed:", error.message);
+  process.exitCode = 1;
+});

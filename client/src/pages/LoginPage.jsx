@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import "../styles/auth.css";
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -43,13 +44,13 @@ export const LoginPage = () => {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="auth-container">
       {/* Left Panel - Branding */}
-      <div style={styles.leftPanel}>
-        <div style={styles.leftContent}>
+      <div className="auth-panel auth-panel--left">
+        <div className="auth-left-content">
           {/* Logo */}
-          <div style={styles.logoContainer}>
-            <div style={styles.logoIcon}>
+          <div className="auth-logo-container">
+            <div className="auth-logo-icon">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                 <rect width="40" height="40" rx="8" fill="#2563EB" />
                 <path
@@ -62,44 +63,46 @@ export const LoginPage = () => {
                 <circle cx="20" cy="20" r="3" fill="#2563EB" />
               </svg>
             </div>
-            <span style={styles.logoText}>SupportHub</span>
+            <span className="auth-logo-text">SupportHub</span>
           </div>
 
           {/* Heading */}
-          <h1 style={styles.heading}>
+          <h1 className="auth-heading">
             Smart
             <br />
-            <span style={styles.headingAccent}>Support Ticket</span>
+            <span className="auth-heading-accent">Support Ticket</span>
             <br />
             Management
           </h1>
-          <p style={styles.subheading}>
+          <p className="auth-subheading">
             Raise, track and resolve issues efficiently in one place.
           </p>
 
           {/* Feature Highlights */}
-          <div style={styles.features}>
-            <div style={styles.feature}>
-              <div style={styles.featureIcon}>⚡</div>
+          <div className="auth-features">
+            <div className="auth-feature">
+              <div className="auth-feature-icon">⚡</div>
               <div>
-                <div style={styles.featureTitle}>Faster Resolution</div>
-                <div style={styles.featureDesc}>
+                <div className="auth-feature-title">Faster Resolution</div>
+                <div className="auth-feature-desc">
                   Get your issues resolved quickly
                 </div>
               </div>
             </div>
-            <div style={styles.feature}>
-              <div style={styles.featureIcon}>📊</div>
+            <div className="auth-feature">
+              <div className="auth-feature-icon">📊</div>
               <div>
-                <div style={styles.featureTitle}>Track Progress</div>
-                <div style={styles.featureDesc}>Stay updated in real-time</div>
+                <div className="auth-feature-title">Track Progress</div>
+                <div className="auth-feature-desc">
+                  Stay updated in real-time
+                </div>
               </div>
             </div>
-            <div style={styles.feature}>
-              <div style={styles.featureIcon}>👥</div>
+            <div className="auth-feature">
+              <div className="auth-feature-icon">👥</div>
               <div>
-                <div style={styles.featureTitle}>Better Support</div>
-                <div style={styles.featureDesc}>
+                <div className="auth-feature-title">Better Support</div>
+                <div className="auth-feature-desc">
                   Connect with the right team
                 </div>
               </div>
@@ -107,7 +110,7 @@ export const LoginPage = () => {
           </div>
 
           {/* Illustration */}
-          <div style={styles.illustration}>
+          <div className="auth-illustration">
             <svg width="280" height="200" viewBox="0 0 280 200" fill="none">
               {/* Ticket card */}
               <rect
@@ -202,21 +205,23 @@ export const LoginPage = () => {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div style={styles.rightPanel}>
-        <div style={styles.rightContent}>
-          <div style={styles.formContainer}>
-            <h2 style={styles.formTitle}>Welcome Back</h2>
-            <p style={styles.formSubtitle}>
-              Sign in to your account to continue
-            </p>
+      <div className="auth-panel auth-panel--right">
+        <div className="auth-right-content">
+          <div className="auth-content">
+            <div className="auth-form-header">
+              <h2 className="auth-form-title">Welcome Back</h2>
+              <p className="auth-form-subtitle">
+                Sign in to your account to continue
+              </p>
+            </div>
 
             {error && (
-              <div style={styles.errorAlert}>
-                <span style={styles.errorIcon}>⚠️</span>
-                <span style={styles.errorText}>{error}</span>
+              <div className="auth-error">
+                <span>⚠️</span>
+                <span>{error}</span>
                 <button
                   onClick={() => setError(null)}
-                  style={styles.errorClose}
+                  className="auth-close-btn"
                   aria-label="Close error"
                 >
                   ×
@@ -224,14 +229,25 @@ export const LoginPage = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} style={styles.form}>
+            <form onSubmit={handleSubmit} className="auth-form">
               {/* Email Field */}
-              <div style={styles.fieldGroup}>
-                <label htmlFor="email" style={styles.label}>
+              <div className="auth-input-wrapper">
+                <label htmlFor="email" className="auth-input-label">
                   Email address
                 </label>
-                <div style={styles.inputWrapper}>
-                  <span style={styles.inputIcon}>
+                <div className="auth-input-field">
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                    required
+                    autoComplete="email"
+                    className="auth-input"
+                  />
+                  <span className="auth-input-icon">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path
                         d="M2 4L8 8L14 4M2 4V12H14V4M2 4H14"
@@ -242,29 +258,27 @@ export const LoginPage = () => {
                       />
                     </svg>
                   </span>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    required
-                    autoComplete="email"
-                    style={styles.input}
-                    onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
-                    onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
-                  />
                 </div>
               </div>
 
               {/* Password Field */}
-              <div style={styles.fieldGroup}>
-                <label htmlFor="password" style={styles.label}>
+              <div className="auth-input-wrapper">
+                <label htmlFor="password" className="auth-input-label">
                   Password
                 </label>
-                <div style={styles.inputWrapper}>
-                  <span style={styles.inputIcon}>
+                <div className="auth-input-field">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
+                    required
+                    autoComplete="current-password"
+                    className="auth-input"
+                  />
+                  <span className="auth-input-icon">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <rect
                         x="3"
@@ -283,23 +297,10 @@ export const LoginPage = () => {
                       />
                     </svg>
                   </span>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                    required
-                    autoComplete="current-password"
-                    style={styles.input}
-                    onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
-                    onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
-                  />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={styles.showPasswordBtn}
+                    className="auth-show-password-btn"
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
@@ -347,30 +348,26 @@ export const LoginPage = () => {
               </div>
 
               {/* Remember Me & Forgot Password */}
-              <div style={styles.formOptions}>
-                <label style={styles.checkboxLabel}>
+              <div className="auth-checkbox-group">
+                <label className="auth-checkbox-label">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    style={styles.checkbox}
+                    className="auth-checkbox"
                   />
-                  <span style={styles.checkboxText}>Remember me</span>
+                  <span>Remember me</span>
                 </label>
-                <a href="#" style={styles.forgotLink}>
+                <a href="#" className="auth-link">
                   Forgot password?
                 </a>
               </div>
 
               {/* Sign In Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                style={styles.submitButton}
-              >
+              <button type="submit" disabled={loading} className="auth-button">
                 {loading ? (
                   <>
-                    <span style={styles.spinner} />
+                    <span className="auth-button-spinner" />
                     Signing in...
                   </>
                 ) : (
@@ -381,7 +378,7 @@ export const LoginPage = () => {
                       height="16"
                       viewBox="0 0 16 16"
                       fill="none"
-                      style={styles.arrowIcon}
+                      style={{ marginLeft: "8px", display: "inline" }}
                     >
                       <path
                         d="M3 8H13M13 8L9 4M13 8L9 12"
@@ -397,9 +394,9 @@ export const LoginPage = () => {
             </form>
 
             {/* Register Link */}
-            <div style={styles.registerContainer}>
-              <span style={styles.registerText}>Don't have an account? </span>
-              <a href="/register" style={styles.registerLink}>
+            <div className="auth-link-group">
+              <span className="auth-link-text">Don't have an account? </span>
+              <a href="/register" className="auth-link">
                 Register now
               </a>
             </div>
@@ -409,340 +406,3 @@ export const LoginPage = () => {
     </div>
   );
 };
-
-// Styles
-const styles = {
-  container: {
-    display: "flex",
-    minHeight: "100vh",
-    backgroundColor: "#F9FAFB",
-  },
-
-  // Left Panel Styles
-  leftPanel: {
-    flex: "1",
-    backgroundColor: "#EFF6FF",
-    padding: "3rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
-  },
-
-  leftContent: {
-    maxWidth: "500px",
-    width: "100%",
-    zIndex: 1,
-  },
-
-  logoContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.75rem",
-    marginBottom: "2.5rem",
-  },
-
-  logoIcon: {
-    display: "flex",
-  },
-
-  logoText: {
-    fontSize: "1.5rem",
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-
-  heading: {
-    fontSize: "2.5rem",
-    fontWeight: "700",
-    color: "#1F2937",
-    lineHeight: "1.2",
-    marginBottom: "1rem",
-  },
-
-  headingAccent: {
-    color: "#2563EB",
-  },
-
-  subheading: {
-    fontSize: "1.125rem",
-    color: "#6B7280",
-    marginBottom: "3rem",
-    lineHeight: "1.6",
-  },
-
-  features: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.5rem",
-    marginBottom: "3rem",
-  },
-
-  feature: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "1rem",
-  },
-
-  featureIcon: {
-    fontSize: "1.5rem",
-    backgroundColor: "white",
-    width: "3rem",
-    height: "3rem",
-    borderRadius: "0.75rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-    flexShrink: 0,
-  },
-
-  featureTitle: {
-    fontSize: "1rem",
-    fontWeight: "600",
-    color: "#1F2937",
-    marginBottom: "0.25rem",
-  },
-
-  featureDesc: {
-    fontSize: "0.875rem",
-    color: "#6B7280",
-  },
-
-  illustration: {
-    marginTop: "2rem",
-  },
-
-  // Right Panel Styles
-  rightPanel: {
-    flex: "1",
-    backgroundColor: "white",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "2rem",
-  },
-
-  rightContent: {
-    width: "100%",
-    maxWidth: "420px",
-  },
-
-  formContainer: {
-    width: "100%",
-  },
-
-  formTitle: {
-    fontSize: "1.875rem",
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: "0.5rem",
-  },
-
-  formSubtitle: {
-    fontSize: "0.875rem",
-    color: "#6B7280",
-    marginBottom: "2rem",
-  },
-
-  errorAlert: {
-    backgroundColor: "#FEF2F2",
-    border: "1px solid #FEE2E2",
-    borderRadius: "0.5rem",
-    padding: "0.875rem",
-    marginBottom: "1.5rem",
-    display: "flex",
-    alignItems: "center",
-    gap: "0.75rem",
-  },
-
-  errorIcon: {
-    fontSize: "1.125rem",
-    flexShrink: 0,
-  },
-
-  errorText: {
-    flex: 1,
-    color: "#DC2626",
-    fontSize: "0.875rem",
-  },
-
-  errorClose: {
-    background: "none",
-    border: "none",
-    color: "#DC2626",
-    fontSize: "1.5rem",
-    cursor: "pointer",
-    padding: "0",
-    lineHeight: "1",
-    opacity: "0.7",
-  },
-
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.25rem",
-  },
-
-  fieldGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-  },
-
-  label: {
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    color: "#374151",
-  },
-
-  inputWrapper: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-  },
-
-  inputIcon: {
-    position: "absolute",
-    left: "0.875rem",
-    color: "#9CA3AF",
-    display: "flex",
-    pointerEvents: "none",
-  },
-
-  input: {
-    width: "100%",
-    padding: "0.625rem 0.875rem 0.625rem 2.75rem",
-    fontSize: "0.875rem",
-    border: "1px solid #E5E7EB",
-    borderRadius: "0.5rem",
-    outline: "none",
-    transition: "border-color 0.15s ease",
-    backgroundColor: "white",
-    color: "#1F2937",
-  },
-
-  showPasswordBtn: {
-    position: "absolute",
-    right: "0.875rem",
-    background: "none",
-    border: "none",
-    color: "#9CA3AF",
-    cursor: "pointer",
-    padding: "0.25rem",
-    display: "flex",
-    alignItems: "center",
-  },
-
-  formOptions: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    fontSize: "0.875rem",
-  },
-
-  checkboxLabel: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    cursor: "pointer",
-  },
-
-  checkbox: {
-    width: "1rem",
-    height: "1rem",
-    cursor: "pointer",
-    accentColor: "#2563EB",
-  },
-
-  checkboxText: {
-    color: "#374151",
-  },
-
-  forgotLink: {
-    color: "#2563EB",
-    textDecoration: "none",
-    fontWeight: "500",
-  },
-
-  submitButton: {
-    width: "100%",
-    padding: "0.75rem 1.5rem",
-    backgroundColor: "#2563EB",
-    color: "white",
-    border: "none",
-    borderRadius: "0.5rem",
-    fontSize: "0.9375rem",
-    fontWeight: "600",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "0.5rem",
-    transition: "background-color 0.15s ease",
-    marginTop: "0.5rem",
-  },
-
-  arrowIcon: {
-    marginLeft: "0.25rem",
-  },
-
-  spinner: {
-    width: "1rem",
-    height: "1rem",
-    border: "2px solid rgba(255,255,255,0.3)",
-    borderTopColor: "white",
-    borderRadius: "50%",
-    animation: "spin 0.6s linear infinite",
-  },
-
-  registerContainer: {
-    marginTop: "1.5rem",
-    textAlign: "center",
-    fontSize: "0.875rem",
-  },
-
-  registerText: {
-    color: "#6B7280",
-  },
-
-  registerLink: {
-    color: "#2563EB",
-    fontWeight: "500",
-    textDecoration: "none",
-  },
-};
-
-// Add CSS animation for spinner
-if (typeof document !== "undefined") {
-  const styleSheet = document.createElement("style");
-  styleSheet.textContent = `
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    @media (max-width: 768px) {
-      .login-container {
-        flex-direction: column !important;
-      }
-      .login-left-panel {
-        padding: 2rem !important;
-        min-height: auto !important;
-      }
-      .login-right-panel {
-        padding: 2rem 1.5rem !important;
-      }
-      .login-illustration {
-        display: none !important;
-      }
-      .login-heading {
-        font-size: 2rem !important;
-      }
-    }
-  `;
-  if (!document.querySelector("#login-page-styles")) {
-    styleSheet.id = "login-page-styles";
-    document.head.appendChild(styleSheet);
-  }
-}

@@ -4,17 +4,15 @@
  */
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { ticketAPI } from "../services/api";
 import { CreateTicketModal } from "../components/CreateTicketModal";
-import { DashboardLayout } from "../components/layout/DashboardLayout";
 import { LoadingState } from "../components/common/LoadingState";
 import { ErrorState } from "../components/common/ErrorState";
 import { EmptyState } from "../components/common/EmptyState";
 import { Pagination } from "../components/common/Pagination";
-import { customerNavItems } from "../config/navigation";
-import { sharedStyles } from "../styles/sharedStyles";
+import "../styles/dashboard.css";
 import {
   formatDate,
   getStatusColor,
@@ -24,13 +22,14 @@ import {
 
 export const MyTicketsPage = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const outletContext = useOutletContext();
+  const onOpenLayoutCreate = outletContext?.onOpenCreateTicket;
 
   // Tickets state
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeNav, setActiveNav] = useState("tickets");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Filter states
@@ -38,6 +37,13 @@ export const MyTicketsPage = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
+
+  // Sync searchQuery from layout topbar if provided
+  useEffect(() => {
+    if (outletContext?.searchQuery !== undefined) {
+      setSearchQuery(outletContext.searchQuery);
+    }
+  }, [outletContext?.searchQuery]);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,41 +109,27 @@ export const MyTicketsPage = () => {
     setCurrentPage(1);
   };
 
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
+  const handleCreateTicketClick = () => {
+    if (onOpenLayoutCreate) {
+      onOpenLayoutCreate();
+    } else {
+      setShowCreateModal(true);
+    }
   };
 
   return (
-    <DashboardLayout
-      navItems={customerNavItems}
-      activeNav={activeNav}
-      onNavChange={(nav) => {
-        setActiveNav(nav);
-        if (nav === "dashboard") navigate("/dashboard");
-        else if (nav === "create") setShowCreateModal(true);
-        else if (nav === "tickets") navigate("/tickets");
-        else if (nav === "profile") navigate("/profile");
-      }}
-      searchQuery={searchQuery}
-      onSearchChange={handleSearch}
-      notificationCount={0}
-      showSearch={true}
-      userName={user?.name || "User"}
-      userRole="Customer"
-      onLogout={logout}
-    >
+    <div className="my-tickets-page-view">
       {/* Page Title and Actions */}
-      <div style={styles.pageHeader}>
+      <div className="page-header">
         <div>
-          <h1 style={styles.pageTitle}>My Tickets</h1>
-          <p style={styles.pageSubtitle}>
+          <h1 className="page-title">My Tickets</h1>
+          <p className="page-subtitle">
             Manage and track all your support requests in one place
           </p>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
-          style={styles.createButton}
+          onClick={handleCreateTicketClick}
+          className="create-button"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <circle cx="10" cy="10" r="7" stroke="white" strokeWidth="1.5" />
@@ -153,18 +145,18 @@ export const MyTicketsPage = () => {
       </div>
 
       {/* Filters Section */}
-      <div style={styles.filtersCard}>
-        <div style={styles.filtersRow}>
+      <div className="filters-card">
+        <div className="filters-row">
           {/* Status Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Status</label>
+          <div className="filter-group">
+            <label className="filter-label">Status</label>
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              style={styles.filterSelect}
+              className="filter-select"
             >
               <option value="">All Statuses</option>
               <option value="OPEN">Open</option>
@@ -175,15 +167,15 @@ export const MyTicketsPage = () => {
           </div>
 
           {/* Category Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Category</label>
+          <div className="filter-group">
+            <label className="filter-label">Category</label>
             <select
               value={categoryFilter}
               onChange={(e) => {
                 setCategoryFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              style={styles.filterSelect}
+              className="filter-select"
             >
               <option value="">All Categories</option>
               <option value="Technical Issue">Technical Issue</option>
@@ -194,15 +186,15 @@ export const MyTicketsPage = () => {
           </div>
 
           {/* Priority Filter */}
-          <div style={styles.filterGroup}>
-            <label style={styles.filterLabel}>Priority</label>
+          <div className="filter-group">
+            <label className="filter-label">Priority</label>
             <select
               value={priorityFilter}
               onChange={(e) => {
                 setPriorityFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              style={styles.filterSelect}
+              className="filter-select"
             >
               <option value="">All Priorities</option>
               <option value="HIGH">High</option>
@@ -218,7 +210,7 @@ export const MyTicketsPage = () => {
             priorityFilter) && (
             <button
               onClick={handleClearFilters}
-              style={styles.clearFiltersButton}
+              className="clear-filters-button"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path
@@ -234,7 +226,7 @@ export const MyTicketsPage = () => {
         </div>
 
         {/* Results Count */}
-        <div style={styles.resultsCount}>
+        <div className="results-count">
           Showing {tickets.length} of {totalTickets} tickets
         </div>
       </div>
@@ -272,47 +264,47 @@ export const MyTicketsPage = () => {
           }
         />
       ) : (
-        <div style={styles.tableCard}>
-          <div style={styles.tableContainer}>
-            <table style={styles.table}>
-              <thead style={styles.tableHead}>
+        <div className="table-card">
+          <div className="table-container">
+            <table className="table">
+              <thead>
                 <tr>
-                  <th style={styles.th}>Ticket ID</th>
-                  <th style={styles.th}>Title</th>
-                  <th style={styles.th}>Category</th>
-                  <th style={styles.th}>Status</th>
-                  <th style={styles.th}>Priority</th>
-                  <th style={styles.th}>Created On</th>
-                  <th style={styles.th}>Last Updated</th>
-                  <th style={styles.th}>Actions</th>
+                  <th>Ticket ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Created On</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {tickets.map((ticket) => (
-                  <tr key={ticket._id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <span style={styles.ticketId}>
+                  <tr key={ticket._id}>
+                    <td>
+                      <span className="ticket-id">
                         #TK-{String(ticket._id).slice(-4).toUpperCase()}
                       </span>
                     </td>
-                    <td style={styles.td}>
-                      <div style={styles.ticketTitleContainer}>
-                        <span style={styles.ticketTitle}>{ticket.title}</span>
-                        <span style={styles.ticketDescription}>
+                    <td>
+                      <div className="ticket-title-container">
+                        <span className="ticket-title">{ticket.title}</span>
+                        <span className="ticket-description">
                           {ticket.description?.substring(0, 60)}
                           {ticket.description?.length > 60 ? "..." : ""}
                         </span>
                       </div>
                     </td>
-                    <td style={styles.td}>
-                      <span style={styles.category}>
+                    <td>
+                      <span className="category-cell">
                         {ticket.category || "Technical Issue"}
                       </span>
                     </td>
-                    <td style={styles.td}>
+                    <td>
                       <span
+                        className="status-badge"
                         style={{
-                          ...styles.statusBadge,
                           color: getStatusColor(ticket.status),
                           backgroundColor: `${getStatusColor(ticket.status)}15`,
                         }}
@@ -320,10 +312,10 @@ export const MyTicketsPage = () => {
                         ● {ticket.status.replace("_", " ")}
                       </span>
                     </td>
-                    <td style={styles.td}>
+                    <td>
                       <span
+                        className="priority-badge"
                         style={{
-                          ...styles.priorityBadge,
                           color: getPriorityColor(ticket.priority),
                           backgroundColor: `${getPriorityColor(ticket.priority)}15`,
                         }}
@@ -331,20 +323,20 @@ export const MyTicketsPage = () => {
                         {ticket.priority}
                       </span>
                     </td>
-                    <td style={styles.td}>
-                      <span style={styles.dateText}>
+                    <td>
+                      <span className="date-text">
                         {formatDate(ticket.createdAt)}
                       </span>
                     </td>
-                    <td style={styles.td}>
-                      <span style={styles.dateText}>
+                    <td>
+                      <span className="date-text">
                         {formatDate(ticket.updatedAt)}
                       </span>
                     </td>
-                    <td style={styles.td}>
+                    <td>
                       <button
                         onClick={() => navigate(`/tickets/${ticket._id}`)}
-                        style={styles.viewButton}
+                        className="view-button"
                         title="View details"
                       >
                         <svg
@@ -388,232 +380,17 @@ export const MyTicketsPage = () => {
         </div>
       )}
 
-      {/* Create Ticket Modal */}
-      <CreateTicketModal
-        isOpen={showCreateModal}
-        onClose={() => {
-          setShowCreateModal(false);
-          setActiveNav("tickets");
-        }}
-        onSuccess={() => {
-          fetchTickets();
-          setShowCreateModal(false);
-          setActiveNav("tickets");
-        }}
-      />
-    </DashboardLayout>
+      {/* Create Ticket Modal Fallback */}
+      {showCreateModal && (
+        <CreateTicketModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            fetchTickets();
+            setShowCreateModal(false);
+          }}
+        />
+      )}
+    </div>
   );
-};
-
-// Inline styles for page-specific UI (filters, table, etc.)
-const styles = {
-  pageHeader: {
-    padding: "2rem",
-    backgroundColor: "white",
-    borderBottom: "1px solid #E5E7EB",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginLeft: "260px",
-  },
-
-  pageTitle: {
-    fontSize: "1.875rem",
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: "0.5rem",
-  },
-
-  pageSubtitle: {
-    fontSize: "0.875rem",
-    color: "#6B7280",
-  },
-
-  createButton: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    padding: "0.75rem 1.5rem",
-    fontSize: "0.875rem",
-    fontWeight: "600",
-    color: "white",
-    backgroundColor: "#2563EB",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    transition: "all 0.2s",
-  },
-
-  filtersCard: {
-    margin: "1.5rem 2rem 0 calc(260px + 2rem)",
-    padding: "1.5rem",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    border: "1px solid #E5E7EB",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
-  },
-
-  filtersRow: {
-    display: "flex",
-    gap: "1rem",
-    alignItems: "flex-end",
-    flexWrap: "wrap",
-  },
-
-  filterGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-    minWidth: "180px",
-  },
-
-  filterLabel: {
-    fontSize: "0.75rem",
-    fontWeight: "600",
-    color: "#6B7280",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-  },
-
-  filterSelect: {
-    padding: "0.625rem 0.875rem",
-    fontSize: "0.875rem",
-    color: "#374151",
-    backgroundColor: "white",
-    border: "1px solid #D1D5DB",
-    borderRadius: "8px",
-    outline: "none",
-    cursor: "pointer",
-    transition: "all 0.2s",
-  },
-
-  clearFiltersButton: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    padding: "0.625rem 1rem",
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    color: "#6B7280",
-    backgroundColor: "#F9FAFB",
-    border: "1px solid #E5E7EB",
-    borderRadius: "8px",
-    cursor: "pointer",
-    transition: "all 0.2s",
-  },
-
-  resultsCount: {
-    marginTop: "1rem",
-    fontSize: "0.875rem",
-    color: "#6B7280",
-  },
-
-  tableCard: {
-    margin: "1.5rem 2rem 2rem calc(260px + 2rem)",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    border: "1px solid #E5E7EB",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
-    overflow: "hidden",
-  },
-
-  tableContainer: {
-    overflowX: "auto",
-  },
-
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-
-  tableHead: {
-    backgroundColor: "#F9FAFB",
-  },
-
-  th: {
-    padding: "1rem",
-    fontSize: "0.75rem",
-    fontWeight: "600",
-    color: "#6B7280",
-    textAlign: "left",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    borderBottom: "1px solid #E5E7EB",
-  },
-
-  tr: {
-    borderBottom: "1px solid #F3F4F6",
-    transition: "background-color 0.2s",
-  },
-
-  td: {
-    padding: "1rem",
-    fontSize: "0.875rem",
-    color: "#374151",
-  },
-
-  ticketId: {
-    fontFamily: "monospace",
-    fontSize: "0.8125rem",
-    fontWeight: "600",
-    color: "#2563EB",
-  },
-
-  ticketTitleContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.25rem",
-  },
-
-  ticketTitle: {
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-
-  ticketDescription: {
-    fontSize: "0.75rem",
-    color: "#9CA3AF",
-  },
-
-  category: {
-    fontSize: "0.8125rem",
-    color: "#6B7280",
-  },
-
-  statusBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.375rem",
-    padding: "0.375rem 0.75rem",
-    fontSize: "0.75rem",
-    fontWeight: "600",
-    borderRadius: "6px",
-    textTransform: "uppercase",
-    letterSpacing: "0.3px",
-  },
-
-  priorityBadge: {
-    display: "inline-block",
-    padding: "0.375rem 0.75rem",
-    fontSize: "0.75rem",
-    fontWeight: "600",
-    borderRadius: "6px",
-    textTransform: "uppercase",
-    letterSpacing: "0.3px",
-  },
-
-  dateText: {
-    fontSize: "0.8125rem",
-    color: "#6B7280",
-  },
-
-  viewButton: {
-    padding: "0.5rem",
-    backgroundColor: "transparent",
-    border: "1px solid #E5E7EB",
-    borderRadius: "6px",
-    color: "#6B7280",
-    cursor: "pointer",
-    transition: "all 0.2s",
-  },
 };

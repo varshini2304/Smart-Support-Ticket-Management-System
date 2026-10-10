@@ -1,3 +1,5 @@
+import logger from '../utils/logger.js';
+
 /**
  * Role-based authorization middleware factory
  * Returns middleware that checks if authenticated user has required role
@@ -19,8 +21,11 @@
  */
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
+    const endpoint = req.originalUrl || req.url;
+
     // Check if user was authenticated by previous middleware
     if (!req.user) {
+      logger.auth.authDenied('Authentication required before role authorization check', endpoint, req.method);
       return res.status(401).json({
         error: 'Unauthorized',
         message: 'Authentication required',
@@ -32,6 +37,7 @@ export const authorizeRoles = (...allowedRoles) => {
 
     // Check if user's role is in the allowed list
     if (!allowedRoles.includes(userRole)) {
+      logger.auth.forbidden(req.user.userId, userRole, allowedRoles, endpoint, req.method);
       return res.status(403).json({
         error: 'Forbidden',
         message: 'Insufficient permissions for this resource',

@@ -1,0 +1,215 @@
+/* ==========================================================================
+   AdminPages.css - Styling for Admin Subpages (All Tickets, Assigned, Users, Reports, Profile)
+   ========================================================================== */
+
+/* Subpage Header */
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-page-heading-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-page-title {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.admin-page-subtitle {
+  font-size: 0.925rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.admin-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Modals & Popups within Admin pages */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.admin-modal-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--admin-border-color);
+  overflow: hidden;
+  animation: adminModalScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes adminModalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.admin-modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--admin-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.admin-modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0.25rem;
+}
+
+.admin-modal-close-btn:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+.admin-modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--admin-border-color);
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* User Management Specific Styles */
+.admin-users-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.admin-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.role-admin {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.role-customer {
+  background-color: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* Reports Specific Styles */
+.admin-reports-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.admin-report-chart-card {
+  background-color: #ffffff;
+  border: 1px solid var(--admin-border-color);
+  border-radius: var(--admin-card-radius);
+  padding: 1.5rem;
+  box-shadow: var(--admin-card-shadow);
+}
+
+.admin-reports-2col-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Profile embed in Admin layout */
+.admin-profile-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-profile-header-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.admin-profile-large-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .admin-users-grid,
+  .admin-reports-stats-row,
+  .admin-reports-2col-grid {
+    grid-template-columns: 1fr;
+  }
+}
