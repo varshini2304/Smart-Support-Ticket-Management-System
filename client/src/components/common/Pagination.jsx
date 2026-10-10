@@ -4,8 +4,6 @@ export const Pagination = ({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
-  onPreviousPage,
-  onNextPage,
 }) => {
   if (totalPages <= 1) return null;
 
@@ -15,11 +13,6 @@ export const Pagination = ({
 
     if (onPageChange) {
       onPageChange(safePage);
-    }
-    if (safePage < currentPage && onPreviousPage) {
-      onPreviousPage();
-    } else if (safePage > currentPage && onNextPage) {
-      onNextPage();
     }
   };
 

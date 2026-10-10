@@ -59,41 +59,16 @@ export const MyTicketsPage = () => {
     setError(null);
 
     try {
-      const data = await ticketAPI.getMyTickets(currentPage, 10);
-      let filteredTickets = data.tickets || [];
+      const data = await ticketAPI.getMyTickets(currentPage, 10, {
+        search: searchQuery || undefined,
+        status: statusFilter || undefined,
+        priority: priorityFilter || undefined,
+        category: categoryFilter || undefined,
+      });
 
-      // Apply filters
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        filteredTickets = filteredTickets.filter(
-          (ticket) =>
-            ticket.title.toLowerCase().includes(query) ||
-            ticket.description.toLowerCase().includes(query) ||
-            `#TK-${String(ticket._id).slice(-4)}`.toLowerCase().includes(query),
-        );
-      }
-
-      if (statusFilter) {
-        filteredTickets = filteredTickets.filter(
-          (t) => t.status === statusFilter,
-        );
-      }
-
-      if (categoryFilter) {
-        filteredTickets = filteredTickets.filter(
-          (t) => (t.category || "Technical Issue") === categoryFilter,
-        );
-      }
-
-      if (priorityFilter) {
-        filteredTickets = filteredTickets.filter(
-          (t) => t.priority === priorityFilter,
-        );
-      }
-
-      setTickets(filteredTickets);
-      setTotalTickets(filteredTickets.length);
-      setTotalPages(Math.ceil(filteredTickets.length / 10));
+      setTickets(data.tickets || []);
+      setTotalTickets(data.total || 0);
+      setTotalPages(data.pages || 1);
     } catch (err) {
       setError(err.message || "Failed to load tickets");
     } finally {
@@ -372,10 +347,6 @@ export const MyTicketsPage = () => {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={(p) => setCurrentPage(p)}
-              onPreviousPage={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              onNextPage={() =>
-                setCurrentPage((p) => Math.min(totalPages, p + 1))
-              }
             />
           )}
         </div>

@@ -57,34 +57,52 @@ export const getTicketById = async (ticketId, customerId) => {
 };
 
 /**
- * List all tickets for a customer with pagination and sorting
+ * List all tickets for a customer with pagination, sorting, and server-side filters
  * @param {string} customerId - MongoDB ID of customer
- * @param {number} page - Page number (1-indexed)
- * @param {number} limit - Number of results per page
+ * @param {object} options - { page?, limit?, search?, status?, priority?, category? }
  * @returns {Promise<object>} { tickets: [], total, page, pages }
  * @throws {Error} If database error occurs
  */
-export const getCustomerTickets = async (customerId, page = 1, limit = 10) => {
+export const getCustomerTickets = async (customerId, options = {}) => {
   try {
-    // Validate pagination parameters
-    const pageNum = Math.max(1, parseInt(page) || 1);
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 10)); // Max 100 per page
-    const skip = (pageNum - 1) * limitNum;
+    const page = Math.max(1, parseInt(options.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(options.limit) || 10));
+    const skip = (page - 1) * limit;
 
-    // Query tickets for this customer, sorted by createdAt descending (newest first)
-    const tickets = await Ticket.find({ createdBy: customerId })
+    // Build filter — always scoped to this customer
+    const filter = { createdBy: customerId };
+
+    if (options.status) {
+      filter.status = options.status;
+    }
+    if (options.priority) {
+      filter.priority = options.priority;
+    }
+    if (options.category) {
+      filter.category = options.category;
+    }
+
+    // Text search across title and description (case-insensitive)
+    if (options.search) {
+      const escaped = options.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.$or = [
+        { title: { $regex: escaped, $options: 'i' } },
+        { description: { $regex: escaped, $options: 'i' } },
+      ];
+    }
+
+    const tickets = await Ticket.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limitNum);
+      .limit(limit);
 
-    // Get total count for pagination metadata
-    const total = await Ticket.countDocuments({ createdBy: customerId });
-    const pages = Math.ceil(total / limitNum);
+    const total = await Ticket.countDocuments(filter);
+    const pages = Math.ceil(total / limit);
 
     return {
       tickets: tickets.map(t => t.toJSON()),
       total,
-      page: pageNum,
+      page,
       pages,
     };
   } catch (error) {

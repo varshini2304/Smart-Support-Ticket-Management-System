@@ -46,7 +46,7 @@ export const AllTicketsPage = () => {
 
   useEffect(() => {
     fetchTickets();
-  }, [currentPage, statusFilter, priorityFilter]);
+  }, [currentPage, statusFilter, priorityFilter, searchQuery]);
 
   const fetchTickets = async () => {
     setLoading(true);
@@ -56,7 +56,8 @@ export const AllTicketsPage = () => {
         currentPage,
         15,
         statusFilter || null,
-        priorityFilter || null
+        priorityFilter || null,
+        searchQuery || null
       );
       setTickets(data.tickets || []);
       setTotalPages(data.pages || 1);
@@ -179,25 +180,14 @@ export const AllTicketsPage = () => {
     });
   };
 
-  // Filter tickets by global search and local category filter
+  // Category filter is still client-side (no category field in backend query)
   const filteredTickets = useMemo(() => {
+    if (!categoryFilter) return tickets;
     return tickets.filter((ticket) => {
-      // Global search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase().trim();
-        const matchTitle = ticket.title?.toLowerCase().includes(query);
-        const matchId = ticket._id?.toLowerCase().includes(query);
-        const matchDesc = ticket.description?.toLowerCase().includes(query);
-        if (!matchTitle && !matchId && !matchDesc) return false;
-      }
-      // Category filter
-      if (categoryFilter) {
-        const cat = getTicketCategory(ticket);
-        if (cat !== categoryFilter) return false;
-      }
-      return true;
+      const cat = getTicketCategory(ticket);
+      return cat === categoryFilter;
     });
-  }, [tickets, searchQuery, categoryFilter]);
+  }, [tickets, categoryFilter]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>

@@ -45,15 +45,21 @@ export const createTicket = async (req, res, next) => {
 
 /**
  * GET /api/tickets
- * List all tickets for the authenticated customer with pagination
- * Query params: page=1, limit=10
+ * List all tickets for the authenticated customer with pagination and filters
+ * Query params: page=1, limit=10, search=, status=, priority=, category=
  */
 export const getMyTickets = async (req, res, next) => {
   try {
-    const { page, limit } = req.query;
+    const { page, limit, search, status, priority, category } = req.query;
 
-    // Get tickets (service handles pagination validation)
-    const result = await getCustomerTicketsService(req.user.userId, page, limit);
+    const result = await getCustomerTicketsService(req.user.userId, {
+      page,
+      limit,
+      search: search || undefined,
+      status: status || undefined,
+      priority: priority || undefined,
+      category: category || undefined,
+    });
 
     res.status(200).json(result);
   } catch (error) {

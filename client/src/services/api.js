@@ -103,8 +103,14 @@ export const ticketAPI = {
       body: JSON.stringify({ title, description, priority }),
     }),
 
-  getMyTickets: (page = 1, limit = 10) =>
-    apiRequest(`/tickets?page=${page}&limit=${limit}`, { method: 'GET' }),
+  getMyTickets: (page = 1, limit = 10, filters = {}) => {
+    let endpoint = `/tickets?page=${page}&limit=${limit}`;
+    if (filters.search) endpoint += `&search=${encodeURIComponent(filters.search)}`;
+    if (filters.status) endpoint += `&status=${filters.status}`;
+    if (filters.priority) endpoint += `&priority=${filters.priority}`;
+    if (filters.category) endpoint += `&category=${filters.category}`;
+    return apiRequest(endpoint, { method: 'GET' });
+  },
 
   getTicket: (ticketId) =>
     apiRequest(`/tickets/${ticketId}`, { method: 'GET' }),
@@ -120,10 +126,11 @@ export const ticketAPI = {
  * Admin Ticket API calls
  */
 export const adminAPI = {
-  getAllTickets: (page = 1, limit = 10, status = null, priority = null) => {
+  getAllTickets: (page = 1, limit = 10, status = null, priority = null, search = null) => {
     let endpoint = `/admin/tickets?page=${page}&limit=${limit}`;
     if (status) endpoint += `&status=${status}`;
     if (priority) endpoint += `&priority=${priority}`;
+    if (search) endpoint += `&search=${encodeURIComponent(search)}`;
     return apiRequest(endpoint, { method: 'GET' });
   },
 

@@ -96,12 +96,12 @@ export const resolveTicket = async (req, res, next) => {
 
 /**
  * GET /api/admin/tickets
- * List all tickets with optional filtering
- * Query params: page=1, limit=10, status=?, priority=?
+ * List all tickets with optional filtering and search
+ * Query params: page=1, limit=10, status=?, priority=?, search=?
  */
 export const getAllTicketsAdmin = async (req, res, next) => {
   try {
-    const { page, limit, status, priority } = req.query;
+    const { page, limit, status, priority, search } = req.query;
 
     // Validate pagination parameters
     const paginationValidation = validatePaginationParams(page, limit);
@@ -121,8 +121,14 @@ export const getAllTicketsAdmin = async (req, res, next) => {
       });
     }
 
-    // Get tickets
-    const result = await getAllTickets({ page, limit, status, priority });
+    // Get tickets with optional search
+    const result = await getAllTickets({
+      page,
+      limit,
+      status,
+      priority,
+      search: search || undefined,
+    });
 
     res.status(200).json(result);
   } catch (error) {

@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 
 /**
  * List all tickets with admin filtering, pagination, and sorting
- * @param {object} options - { page?, limit?, status?, priority? }
+ * @param {object} options - { page?, limit?, status?, priority?, search? }
  * @returns {Promise<object>} { tickets: [], total, page, pages }
  * @throws {Error} If database error occurs
  */
@@ -27,6 +27,15 @@ export const getAllTickets = async (options = {}) => {
     }
     if (options.priority) {
       filter.priority = options.priority;
+    }
+
+    // Text search across title and description (case-insensitive)
+    if (options.search) {
+      const escaped = options.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.$or = [
+        { title: { $regex: escaped, $options: 'i' } },
+        { description: { $regex: escaped, $options: 'i' } },
+      ];
     }
 
     // Query all tickets with optional filters, sorted by createdAt descending
