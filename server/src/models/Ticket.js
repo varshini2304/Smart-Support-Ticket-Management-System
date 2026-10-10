@@ -32,6 +32,26 @@ const ticketSchema = new mongoose.Schema(
       },
       default: 'MEDIUM',
     },
+    category: {
+      type: String,
+      trim: true,
+      default: 'Technical Issue',
+    },
+    resolutionNote: {
+      type: String,
+      trim: true,
+      maxlength: [500, 'Resolution note must not exceed 500 characters'],
+      default: null,
+    },
+    resolvedAt: {
+      type: Date,
+      default: null,
+    },
+    resolvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

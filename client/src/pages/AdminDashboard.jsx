@@ -186,9 +186,14 @@ export const AdminDashboard = () => {
         title: ticket.title,
         ticketId: `#TK-${String(ticket._id).slice(-4).toUpperCase()}`,
         time: getTimeAgo(ticket.updatedAt || ticket.createdAt),
-        user: typeof ticket.createdBy === "string" && ticket.createdBy.length < 15
-          ? ticket.createdBy
-          : "Customer",
+        user:
+          ticket.createdBy?.name ||
+          ticket.createdBy?.email ||
+          (ticket.createdBy?._id
+            ? `User #${String(ticket.createdBy._id).slice(-4).toUpperCase()}`
+            : typeof ticket.createdBy === "string"
+            ? `User #${ticket.createdBy.slice(-4).toUpperCase()}`
+            : "Customer"),
       };
     });
   }, [tickets]);
@@ -622,10 +627,15 @@ export const AdminDashboard = () => {
                 {filteredTickets.map((ticket) => {
                   const displayId = `#TK-${String(ticket._id).slice(-4).toUpperCase()}`;
                   const category = getTicketCategory(ticket);
+                  const customerUser = ticket.createdBy;
+                  const customerId =
+                    customerUser?._id ||
+                    (typeof customerUser === "string" ? customerUser : null);
+
                   const customerName =
-                    typeof ticket.createdBy === "string" && ticket.createdBy.length < 20
-                      ? ticket.createdBy
-                      : "Customer";
+                    customerUser?.name ||
+                    customerUser?.email ||
+                    (customerId ? `Customer (${String(customerId).slice(-6).toUpperCase()})` : "Unassigned");
 
                   return (
                     <tr key={ticket._id}>
@@ -638,7 +648,19 @@ export const AdminDashboard = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="admin-customer-cell">{customerName}</span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+                          <span
+                            className="admin-customer-cell"
+                            title={customerId ? `User ID: ${customerId}` : undefined}
+                          >
+                            {customerName}
+                          </span>
+                          {customerId && (
+                            <span style={{ fontSize: "0.7rem", color: "#94a3b8", fontFamily: "monospace" }}>
+                              ID: {String(customerId).slice(-6).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td>
                         <span className="admin-category-badge">{category}</span>

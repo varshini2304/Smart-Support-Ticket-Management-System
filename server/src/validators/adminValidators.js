@@ -49,8 +49,52 @@ export const validatePriorityUpdate = (priority) => {
 };
 
 /**
- * Validate admin ticket update (status and/or priority)
- * @param {object} data - Data to validate { status?, priority? }
+ * Validate resolution note
+ * @param {string} note - Resolution note
+ * @returns {{ valid: boolean, error?: string, sanitized?: string }} Validation result
+ */
+export const validateResolutionNote = (note) => {
+  if (note === undefined || note === null) {
+    return { valid: false, error: 'Resolution note is required' };
+  }
+  if (typeof note !== 'string') {
+    return { valid: false, error: 'Resolution note must be a string' };
+  }
+  const trimmed = note.trim();
+  if (trimmed.length === 0) {
+    return { valid: false, error: 'Resolution note cannot be empty' };
+  }
+  if (trimmed.length > 500) {
+    return { valid: false, error: 'Resolution note must not exceed 500 characters' };
+  }
+  return { valid: true, sanitized: trimmed };
+};
+
+/**
+ * Validate resolve ticket payload
+ * @param {object} data - { resolutionNote }
+ * @returns {{ valid: boolean, error?: string, resolutionNote?: string }} Validation result
+ */
+export const validateResolveTicket = (data) => {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Request body must be a valid object' };
+  }
+
+  if (data.resolutionNote === undefined || data.resolutionNote === null) {
+    return { valid: false, error: 'Resolution note is required' };
+  }
+
+  const noteValidation = validateResolutionNote(data.resolutionNote);
+  if (!noteValidation.valid) {
+    return noteValidation;
+  }
+
+  return { valid: true, resolutionNote: noteValidation.sanitized };
+};
+
+/**
+ * Validate admin ticket update (status and/or priority and/or resolutionNote)
+ * @param {object} data - Data to validate { status?, priority?, resolutionNote? }
  * @returns {{ valid: boolean, error?: string }} Validation result
  */
 export const validateAdminTicketUpdate = (data) => {
@@ -72,8 +116,8 @@ export const validateAdminTicketUpdate = (data) => {
   }
 
   // At least one updatable field must be provided
-  if (data.status === undefined && data.priority === undefined) {
-    return { valid: false, error: 'At least one of status or priority must be provided' };
+  if (data.status === undefined && data.priority === undefined && data.resolutionNote === undefined) {
+    return { valid: false, error: 'At least one of status or priority (or resolution note) must be provided' };
   }
 
   // If status is provided, validate it
@@ -89,6 +133,14 @@ export const validateAdminTicketUpdate = (data) => {
     const priorityValidation = validatePriorityUpdate(data.priority);
     if (!priorityValidation.valid) {
       return priorityValidation;
+    }
+  }
+
+  // If resolutionNote is provided, validate it
+  if (data.resolutionNote !== undefined) {
+    const noteValidation = validateResolutionNote(data.resolutionNote);
+    if (!noteValidation.valid) {
+      return noteValidation;
     }
   }
 

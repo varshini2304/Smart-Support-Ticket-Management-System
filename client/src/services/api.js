@@ -1,9 +1,3 @@
-/**
- * API Service
- * Centralized HTTP client for all backend communication
- * Handles JWT token attachment, error handling, and request/response parsing
- */
-
 const API_BASE_URL = '/api';
 
 /**
@@ -22,9 +16,7 @@ const storeToken = (token) => {
   localStorage.setItem('authToken', token);
 };
 
-/**
- * Remove JWT token from localStorage
- */
+
 const clearToken = () => {
   localStorage.removeItem('authToken');
 };
@@ -38,13 +30,12 @@ const clearToken = () => {
  */
 const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
 
-  // Attach JWT token if available
   const token = getStoredToken();
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -77,9 +68,7 @@ const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-/**
- * Authentication API calls
- */
+
 export const authAPI = {
   register: (name, email, password) =>
     apiRequest('/auth/register', {
@@ -87,6 +76,7 @@ export const authAPI = {
       body: JSON.stringify({ name, email, password }),
     }),
 
+  
   login: (email, password) =>
     apiRequest('/auth/login', {
       method: 'POST',
@@ -106,9 +96,6 @@ export const authAPI = {
   },
 };
 
-/**
- * Customer Ticket API calls
- */
 export const ticketAPI = {
   createTicket: (title, description, priority = 'MEDIUM') =>
     apiRequest('/tickets', {
@@ -139,6 +126,15 @@ export const adminAPI = {
     if (priority) endpoint += `&priority=${priority}`;
     return apiRequest(endpoint, { method: 'GET' });
   },
+
+  getTicket: (ticketId) =>
+    apiRequest(`/admin/tickets/${ticketId}`, { method: 'GET' }),
+
+  resolveTicket: (ticketId, resolutionNote) =>
+    apiRequest(`/admin/tickets/${ticketId}/resolve`, {
+      method: 'PATCH',
+      body: JSON.stringify({ resolutionNote }),
+    }),
 
   updateTicket: (ticketId, updates) =>
     apiRequest(`/admin/tickets/${ticketId}`, {

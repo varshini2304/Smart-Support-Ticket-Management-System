@@ -242,11 +242,31 @@ export const AssignedTicketsPage = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="admin-customer-cell">
-                          {typeof ticket.createdBy === "string" && ticket.createdBy.length < 20
-                            ? ticket.createdBy
-                            : "Customer"}
-                        </span>
+                        {(() => {
+                          const customerUser = ticket.createdBy;
+                          const customerId =
+                            customerUser?._id ||
+                            (typeof customerUser === "string" ? customerUser : null);
+                          const customerName =
+                            customerUser?.name ||
+                            customerUser?.email ||
+                            (customerId ? `Customer (${String(customerId).slice(-6).toUpperCase()})` : "Unassigned");
+                          return (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+                              <span
+                                className="admin-customer-cell"
+                                title={customerId ? `User ID: ${customerId}` : undefined}
+                              >
+                                {customerName}
+                              </span>
+                              {customerId && (
+                                <span style={{ fontSize: "0.7rem", color: "#94a3b8", fontFamily: "monospace" }}>
+                                  ID: {String(customerId).slice(-6).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td>
                         {ticket.assignedTo ? (

@@ -50,23 +50,34 @@ export const UsersPage = () => {
       });
     }
 
-    // 2. Customers extracted from tickets
+    // 2. Users and customers extracted from tickets
     tickets.forEach((ticket, idx) => {
-      const creatorName =
-        typeof ticket.createdBy === "string" && ticket.createdBy.length < 25
+      const creatorObj =
+        typeof ticket.createdBy === "object" && ticket.createdBy !== null
           ? ticket.createdBy
-          : `Customer ${String(ticket._id).slice(-4)}`;
+          : null;
+      const creatorId =
+        creatorObj?._id ||
+        (typeof ticket.createdBy === "string" ? ticket.createdBy : null);
 
-      const emailKey = `${creatorName.toLowerCase().replace(/\s+/g, ".")}@customer.support`;
+      if (!creatorId && !creatorObj) return;
 
-      if (userMap.has(emailKey)) {
-        userMap.get(emailKey).ticketsCount += 1;
+      const creatorName =
+        creatorObj?.name ||
+        (creatorId ? `User #${String(creatorId).slice(-4).toUpperCase()}` : "Customer");
+      const creatorEmail = creatorObj?.email || "Not Provided";
+      const creatorRole = creatorObj?.role || "CUSTOMER";
+
+      const key = creatorId ? String(creatorId) : creatorEmail;
+
+      if (userMap.has(key)) {
+        userMap.get(key).ticketsCount += 1;
       } else {
-        userMap.set(emailKey, {
-          id: ticket.createdBy || `usr-${idx + 1}`,
+        userMap.set(key, {
+          id: creatorId || `usr-${idx + 1}`,
           name: creatorName,
-          email: emailKey,
-          role: "CUSTOMER",
+          email: creatorEmail,
+          role: creatorRole,
           ticketsCount: 1,
           status: "Active",
           createdAt: ticket.createdAt,

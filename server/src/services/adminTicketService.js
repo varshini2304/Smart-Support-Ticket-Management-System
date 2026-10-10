@@ -31,6 +31,9 @@ export const getAllTickets = async (options = {}) => {
 
     // Query all tickets with optional filters, sorted by createdAt descending
     const tickets = await Ticket.find(filter)
+      .populate('createdBy', 'name email role')
+      .populate('assignedTo', 'name email role')
+      .populate('resolvedBy', 'name email role')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -40,7 +43,19 @@ export const getAllTickets = async (options = {}) => {
     const pages = Math.ceil(total / limit);
 
     return {
-      tickets: tickets.map(t => t.toJSON()),
+      tickets: tickets.map(t => {
+        const json = t.toJSON();
+        if (!json.createdBy && t.populated('createdBy')) {
+          json.createdBy = { _id: t.populated('createdBy') };
+        }
+        if (!json.assignedTo && t.populated('assignedTo')) {
+          json.assignedTo = { _id: t.populated('assignedTo') };
+        }
+        if (!json.resolvedBy && t.populated('resolvedBy')) {
+          json.resolvedBy = { _id: t.populated('resolvedBy') };
+        }
+        return json;
+      }),
       total,
       page,
       pages,
@@ -62,8 +77,24 @@ export const getTicketByIdAdmin = async (ticketId) => {
       return null;
     }
 
-    const ticket = await Ticket.findById(ticketId);
-    return ticket ? ticket.toJSON() : null;
+    const ticket = await Ticket.findById(ticketId)
+      .populate('createdBy', 'name email role')
+      .populate('assignedTo', 'name email role')
+      .populate('resolvedBy', 'name email role');
+
+    if (!ticket) return null;
+
+    const json = ticket.toJSON();
+    if (!json.createdBy && ticket.populated('createdBy')) {
+      json.createdBy = { _id: ticket.populated('createdBy') };
+    }
+    if (!json.assignedTo && ticket.populated('assignedTo')) {
+      json.assignedTo = { _id: ticket.populated('assignedTo') };
+    }
+    if (!json.resolvedBy && ticket.populated('resolvedBy')) {
+      json.resolvedBy = { _id: ticket.populated('resolvedBy') };
+    }
+    return json;
   } catch (error) {
     throw error;
   }
@@ -72,7 +103,7 @@ export const getTicketByIdAdmin = async (ticketId) => {
 /**
  * Update ticket status and/or priority (admin only)
  * @param {string} ticketId - MongoDB ID of ticket
- * @param {object} updates - { status?, priority? }
+ * @param {object} updates - { status?, priority?, resolutionNote?, resolvedBy? }
  * @returns {Promise<object|null>} Updated ticket if found, null if not found
  * @throws {Error} If validation or database error occurs
  */
@@ -86,9 +117,18 @@ export const updateTicketAdmin = async (ticketId, updates) => {
     const allowedUpdates = {};
     if (updates.status !== undefined) {
       allowedUpdates.status = updates.status;
+      if (updates.status === 'RESOLVED') {
+        allowedUpdates.resolvedAt = updates.resolvedAt || new Date();
+        if (updates.resolvedBy) {
+          allowedUpdates.resolvedBy = updates.resolvedBy;
+        }
+      }
     }
     if (updates.priority !== undefined) {
       allowedUpdates.priority = updates.priority;
+    }
+    if (updates.resolutionNote !== undefined) {
+      allowedUpdates.resolutionNote = updates.resolutionNote;
     }
 
     // Update ticket
@@ -99,9 +139,69 @@ export const updateTicketAdmin = async (ticketId, updates) => {
         new: true,
         runValidators: true,
       }
-    );
+    )
+      .populate('createdBy', 'name email role')
+      .populate('assignedTo', 'name email role')
+      .populate('resolvedBy', 'name email role');
 
     return ticket ? ticket.toJSON() : null;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Resolve ticket (admin only)
+ * Updates status to RESOLVED, sets resolution note, resolvedAt, and resolving admin ID
+ * Idempotent: if already resolved, updates resolution note if provided
+ * @param {string} ticketId - MongoDB ID of ticket
+ * @param {string} resolutionNote - Explanation/notes on how ticket was resolved
+ * @param {string} adminUserId - ID of resolving administrator
+ * @returns {Promise<object|null>} Updated ticket if found, null if not found
+ */
+export const resolveTicketAdmin = async (ticketId, resolutionNote, adminUserId) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(ticketId)) {
+      return null;
+    }
+
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return null;
+    }
+
+    const wasAlreadyResolved = ticket.status === 'RESOLVED';
+
+    ticket.status = 'RESOLVED';
+    if (resolutionNote !== undefined) {
+      ticket.resolutionNote = resolutionNote.trim();
+    }
+    ticket.resolvedAt = ticket.resolvedAt || new Date();
+    if (adminUserId && mongoose.Types.ObjectId.isValid(adminUserId)) {
+      ticket.resolvedBy = adminUserId;
+    }
+
+    await ticket.save();
+
+    const populated = await Ticket.findById(ticket._id)
+      .populate('createdBy', 'name email role')
+      .populate('assignedTo', 'name email role')
+      .populate('resolvedBy', 'name email role');
+
+    const result = populated ? populated.toJSON() : ticket.toJSON();
+    if (populated) {
+      if (!result.createdBy && populated.populated('createdBy')) {
+        result.createdBy = { _id: populated.populated('createdBy') };
+      }
+      if (!result.assignedTo && populated.populated('assignedTo')) {
+        result.assignedTo = { _id: populated.populated('assignedTo') };
+      }
+      if (!result.resolvedBy && populated.populated('resolvedBy')) {
+        result.resolvedBy = { _id: populated.populated('resolvedBy') };
+      }
+    }
+    result.wasAlreadyResolved = wasAlreadyResolved;
+    return result;
   } catch (error) {
     throw error;
   }

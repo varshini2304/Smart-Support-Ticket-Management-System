@@ -13,6 +13,8 @@ import {
   validateAssignmentRequest,
   validatePaginationParams,
   validateTicketFilters,
+  validateResolutionNote,
+  validateResolveTicket,
 } from '../src/validators/adminValidators.js';
 
 // ============================================================================
@@ -299,4 +301,84 @@ describe('Admin Validators', () => {
       expect(result.valid).toBe(true);
     });
   });
+
+  describe('validateResolutionNote', () => {
+    it('should accept valid resolution note', () => {
+      const result = validateResolutionNote('Reset password and confirmed login.');
+      expect(result.valid).toBe(true);
+      expect(result.sanitized).toBe('Reset password and confirmed login.');
+    });
+
+    it('should trim surrounding whitespace', () => {
+      const result = validateResolutionNote('   Fixed network gateway issue.   ');
+      expect(result.valid).toBe(true);
+      expect(result.sanitized).toBe('Fixed network gateway issue.');
+    });
+
+    it('should accept max length 500 characters', () => {
+      const longNote = 'A'.repeat(500);
+      const result = validateResolutionNote(longNote);
+      expect(result.valid).toBe(true);
+    });
+
+    it('should reject note exceeding 500 characters', () => {
+      const tooLongNote = 'A'.repeat(501);
+      const result = validateResolutionNote(tooLongNote);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('500 characters');
+    });
+
+    it('should reject non-string note', () => {
+      const result = validateResolutionNote(12345);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('must be a string');
+    });
+
+    it('should reject empty or whitespace-only note', () => {
+      const result = validateResolutionNote('   ');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('cannot be empty');
+    });
+
+    it('should reject undefined note', () => {
+      const result = validateResolutionNote(undefined);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('required');
+    });
+
+    it('should reject null note', () => {
+      const result = validateResolutionNote(null);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('required');
+    });
+  });
+
+  describe('validateResolveTicket', () => {
+    it('should accept valid resolution payload', () => {
+      const result = validateResolveTicket({
+        resolutionNote: 'Issue resolved after applying system patch.',
+      });
+      expect(result.valid).toBe(true);
+      expect(result.resolutionNote).toBe('Issue resolved after applying system patch.');
+    });
+
+    it('should reject payload with missing resolutionNote', () => {
+      const result = validateResolveTicket({});
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('Resolution note is required');
+    });
+
+    it('should reject payload with empty resolutionNote', () => {
+      const result = validateResolveTicket({ resolutionNote: '' });
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('cannot be empty');
+    });
+
+    it('should reject non-object payload', () => {
+      const result = validateResolveTicket(null);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('valid object');
+    });
+  });
 });
+

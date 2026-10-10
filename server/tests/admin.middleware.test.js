@@ -66,6 +66,37 @@ const createTestApp = () => {
   });
 
   /**
+   * Test endpoint: Get single ticket (protected)
+   */
+  app.get('/api/admin/tickets/:id', authenticate, authorizeRoles('ADMIN'), (req, res) => {
+    res.json({
+      message: 'Ticket details retrieved',
+      ticketId: req.params.id,
+      role: req.user.role,
+    });
+  });
+
+  /**
+   * Test endpoint: Resolve ticket (protected)
+   */
+  app.patch('/api/admin/tickets/:id/resolve', authenticate, authorizeRoles('ADMIN'), (req, res) => {
+    const { resolutionNote } = req.body || {};
+    if (!resolutionNote || typeof resolutionNote !== 'string' || !resolutionNote.trim()) {
+      return res.status(400).json({ error: 'Resolution note is required and cannot be empty' });
+    }
+    if (resolutionNote.trim().length > 500) {
+      return res.status(400).json({ error: 'Resolution note cannot exceed 500 characters' });
+    }
+    res.json({
+      message: 'Ticket resolved successfully',
+      ticketId: req.params.id,
+      resolutionNote: resolutionNote.trim(),
+      resolvedBy: req.user.userId,
+      status: 'RESOLVED',
+    });
+  });
+
+  /**
    * Test endpoint: Get statistics (protected)
    */
   app.get('/api/admin/stats', authenticate, authorizeRoles('ADMIN'), (req, res) => {
@@ -148,6 +179,27 @@ describe('Admin Endpoint Authorization', () => {
       expect(res.status).toBe(403);
       expect(res.body.error).toBe('Forbidden');
     });
+
+    it('should return 403 when CUSTOMER tries to view single admin ticket', async () => {
+      const token = generateTestToken('507f1f77bcf86cd799439011', 'CUSTOMER');
+      const res = await request(app)
+        .get('/api/admin/tickets/607f1f77bcf86cd799439022')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Forbidden');
+    });
+
+    it('should return 403 when CUSTOMER tries to resolve ticket', async () => {
+      const token = generateTestToken('507f1f77bcf86cd799439011', 'CUSTOMER');
+      const res = await request(app)
+        .patch('/api/admin/tickets/607f1f77bcf86cd799439022/resolve')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ resolutionNote: 'Unauthorized resolution attempt' });
+
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Forbidden');
+    });
   });
 
   describe('ADMIN Access to Admin Endpoints', () => {
@@ -177,6 +229,65 @@ describe('Admin Endpoint Authorization', () => {
       expect(res.status).toBe(200);
       expect(res.body.message).toBe('Ticket updated');
       expect(res.body.ticketId).toBe(ticketId);
+    });
+
+    it('should return 200 when ADMIN views single ticket', async () => {
+      const token = generateTestToken('507f1f77bcf86cd799439011', 'ADMIN');
+      const ticketId = '607f1f77bcf86cd799439022';
+
+      const res = await request(app)
+        .get(`/api/admin/tickets/${ticketId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Ticket details retrieved');
+      expect(res.body.ticketId).toBe(ticketId);
+    });
+
+    it('should return 200 when ADMIN resolves ticket with valid note', async () => {
+      const adminId = '507f1f77bcf86cd799439011';
+      const token = generateTestToken(adminId, 'ADMIN');
+      const ticketId = '607f1f77bcf86cd799439022';
+      const note = 'Reset credentials and verified account access.';
+
+      const res = await request(app)
+        .patch(`/api/admin/tickets/${ticketId}/resolve`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ resolutionNote: note });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Ticket resolved successfully');
+      expect(res.body.ticketId).toBe(ticketId);
+      expect(res.body.resolutionNote).toBe(note);
+      expect(res.body.resolvedBy).toBe(adminId);
+      expect(res.body.status).toBe('RESOLVED');
+    });
+
+    it('should return 400 when ADMIN resolves ticket without resolution note', async () => {
+      const token = generateTestToken('507f1f77bcf86cd799439011', 'ADMIN');
+      const ticketId = '607f1f77bcf86cd799439022';
+
+      const res = await request(app)
+        .patch(`/api/admin/tickets/${ticketId}/resolve`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({});
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain('Resolution note is required');
+    });
+
+    it('should return 400 when ADMIN resolves ticket with note exceeding 500 characters', async () => {
+      const token = generateTestToken('507f1f77bcf86cd799439011', 'ADMIN');
+      const ticketId = '607f1f77bcf86cd799439022';
+      const tooLongNote = 'X'.repeat(501);
+
+      const res = await request(app)
+        .patch(`/api/admin/tickets/${ticketId}/resolve`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ resolutionNote: tooLongNote });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain('cannot exceed 500 characters');
     });
 
     it('should return 200 when ADMIN assigns ticket', async () => {
@@ -212,10 +323,25 @@ describe('Admin Endpoint Authorization', () => {
       expect(res.body.error).toBe('Unauthorized');
     });
 
+    it('should return 401 when viewing single ticket without token', async () => {
+      const res = await request(app).get('/api/admin/tickets/607f1f77bcf86cd799439022');
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe('Unauthorized');
+    });
+
     it('should return 401 when updating ticket without token', async () => {
       const res = await request(app)
         .patch('/api/admin/tickets/607f1f77bcf86cd799439022')
         .send({ status: 'RESOLVED' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe('Unauthorized');
+    });
+
+    it('should return 401 when resolving ticket without token', async () => {
+      const res = await request(app)
+        .patch('/api/admin/tickets/607f1f77bcf86cd799439022/resolve')
+        .send({ resolutionNote: 'Test note' });
 
       expect(res.status).toBe(401);
       expect(res.body.error).toBe('Unauthorized');

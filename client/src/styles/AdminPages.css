@@ -213,3 +213,370 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================
+   Resolve Ticket Modal Styles (Matching Screenshot)
+   ========================================== */
+.admin-resolve-modal-card {
+  background-color: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  animation: adminModalScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-resolve-modal-header {
+  padding: 1.5rem 1.75rem 1.25rem 1.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+}
+
+.admin-resolve-modal-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+}
+
+.admin-resolve-modal-title-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.admin-resolve-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.admin-resolve-modal-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.admin-resolve-modal-body {
+  padding: 0 1.75rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-resolve-alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #b91c1c;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Summary Card */
+.admin-resolve-summary-card {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.admin-resolve-summary-top {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.admin-resolve-doc-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #eff6ff;
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-resolve-summary-titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.admin-resolve-summary-id {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.admin-resolve-summary-ticket-title {
+  font-size: 0.85rem;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-resolve-summary-status {
+  flex-shrink: 0;
+}
+
+.admin-resolve-summary-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 1rem 0;
+}
+
+.admin-resolve-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.admin-resolve-grid-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.admin-resolve-grid-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.admin-resolve-grid-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.admin-resolve-grid-label {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.admin-resolve-grid-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Resolution Note Section */
+.admin-resolve-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-resolve-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-resolve-field-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.admin-resolve-char-counter {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.admin-resolve-textarea {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #0f172a;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-resolve-textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.admin-resolve-textarea.error {
+  border-color: #ef4444;
+}
+
+.admin-resolve-textarea.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.admin-resolve-validation-message {
+  font-size: 0.8125rem;
+  color: #ef4444;
+  margin: 0.25rem 0 0 0;
+  font-weight: 500;
+}
+
+/* Information Banner */
+.admin-resolve-info-banner {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.admin-resolve-info-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.admin-resolve-info-content {
+  flex: 1;
+}
+
+.admin-resolve-info-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 0.35rem;
+}
+
+.admin-resolve-info-list {
+  margin: 0;
+  padding-left: 1.125rem;
+  font-size: 0.8125rem;
+  color: #1e40af;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Footer Buttons */
+.admin-resolve-modal-footer {
+  padding: 1.125rem 1.75rem;
+  background-color: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.admin-resolve-btn-cancel {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-resolve-btn-cancel:hover:not(:disabled) {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.admin-resolve-btn-submit {
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 0.625rem 1.35rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.admin-resolve-btn-submit:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.admin-resolve-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-spinner-inline {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: adminSpin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes adminSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Action button in table for resolve */
+.admin-action-btn-resolve {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-action-btn-resolve:hover:not(:disabled) {
+  background-color: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+}
+
+.admin-action-btn-resolve:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+.admin-details-modal-card {
+  max-width: 680px;
+  width: 100%;
+}
+

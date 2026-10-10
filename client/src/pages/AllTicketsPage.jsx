@@ -8,6 +8,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { adminAPI } from "../services/api";
 import { TicketStatusBadge } from "../components/admin/TicketStatusBadge";
+import { ResolveTicketModal } from "../components/admin/ResolveTicketModal";
+import { TicketDetailsModal } from "../components/admin/TicketDetailsModal";
 
 export const AllTicketsPage = () => {
   const { searchQuery = "", onOpenCreateTicket, refreshData } = useOutletContext() || {};
@@ -34,6 +36,14 @@ export const AllTicketsPage = () => {
   const [editPriority, setEditPriority] = useState("MEDIUM");
   const [savingEdit, setSavingEdit] = useState(false);
 
+  // Modal for inspecting ticket details (Requirement 1)
+  const [detailsTicket, setDetailsTicket] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  // Modal for resolving ticket (Requirement 2, 3, 4)
+  const [resolvingTicket, setResolvingTicket] = useState(null);
+  const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
+
   useEffect(() => {
     fetchTickets();
   }, [currentPage, statusFilter, priorityFilter]);
@@ -57,6 +67,62 @@ export const AllTicketsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenDetails = (ticket) => {
+    setDetailsTicket(ticket);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleOpenResolve = (ticket) => {
+    setResolvingTicket(ticket);
+    setIsResolveModalOpen(true);
+  };
+
+  const handleExecuteResolve = async (ticketId, note) => {
+    const data = await adminAPI.resolveTicket(ticketId, note);
+    const updatedTicket = data.ticket;
+
+    // Immediately update local tickets state for instant reactive UI
+    setTickets((prev) =>
+      prev.map((t) =>
+        t._id === ticketId
+          ? {
+              ...t,
+              ...(updatedTicket || {}),
+              status: "RESOLVED",
+              resolutionNote: note,
+              resolvedAt: new Date().toISOString(),
+            }
+          : t
+      )
+    );
+
+    // If details modal is open for this ticket, update it
+    if (detailsTicket && detailsTicket._id === ticketId) {
+      setDetailsTicket((prev) => ({
+        ...prev,
+        ...(updatedTicket || {}),
+        status: "RESOLVED",
+        resolutionNote: note,
+        resolvedAt: new Date().toISOString(),
+      }));
+    }
+
+    setSuccessMessage(
+      `Ticket #${String(ticketId).slice(-4).toUpperCase()} marked as resolved successfully.`
+    );
+    setTimeout(() => setSuccessMessage(null), 4000);
+
+    // Re-fetch tickets to ensure complete database sync
+    fetchTickets();
+
+    // Trigger AdminLayout to refresh stats & notification badges
+    if (refreshData) {
+      refreshData();
+    }
+
+    return data;
   };
 
   const handleOpenEdit = (ticket) => {
@@ -295,23 +361,54 @@ export const AllTicketsPage = () => {
                 {filteredTickets.map((ticket) => {
                   const displayId = `#TK-${String(ticket._id).slice(-4).toUpperCase()}`;
                   const category = getTicketCategory(ticket);
+                  const customerUser = ticket.createdBy;
+                  const customerId =
+                    customerUser?._id ||
+                    (typeof customerUser === "string" ? customerUser : null);
+
                   const customerName =
-                    typeof ticket.createdBy === "string" && ticket.createdBy.length < 20
-                      ? ticket.createdBy
-                      : "Customer";
+                    customerUser?.name ||
+                    customerUser?.email ||
+                    (customerId ? `Customer (${String(customerId).slice(-6).toUpperCase()})` : "Unassigned");
+
+                  const isTicketResolved = ticket.status === "RESOLVED";
 
                   return (
                     <tr key={ticket._id}>
                       <td>
-                        <span className="admin-ticket-id-tag">{displayId}</span>
+                        <span
+                          className="admin-ticket-id-tag"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleOpenDetails(ticket)}
+                          title="Click to inspect ticket details"
+                        >
+                          {displayId}
+                        </span>
                       </td>
                       <td>
-                        <div className="admin-ticket-title-cell" title={ticket.title}>
+                        <div
+                          className="admin-ticket-title-cell"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleOpenDetails(ticket)}
+                          title={`Click to inspect details: ${ticket.title}`}
+                        >
                           {ticket.title}
                         </div>
                       </td>
                       <td>
-                        <span className="admin-customer-cell">{customerName}</span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+                          <span
+                            className="admin-customer-cell"
+                            title={customerId ? `User ID: ${customerId}` : undefined}
+                          >
+                            {customerName}
+                          </span>
+                          {customerId && (
+                            <span style={{ fontSize: "0.7rem", color: "#94a3b8", fontFamily: "monospace" }}>
+                              ID: {String(customerId).slice(-6).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td>
                         <span className="admin-category-badge">{category}</span>
@@ -334,19 +431,64 @@ export const AllTicketsPage = () => {
                         </span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="admin-action-btn-view"
-                          title="Manage Ticket"
-                          onClick={() => handleOpenEdit(ticket)}
-                        >
-                          <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
-                            <path
-                              d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        </button>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+                          {/* 1. View / Inspect Details */}
+                          <button
+                            type="button"
+                            className="admin-action-btn-view"
+                            title="Inspect Ticket Details"
+                            onClick={() => handleOpenDetails(ticket)}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                              <path
+                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                            </svg>
+                          </button>
+
+                          {/* 2. Edit Status / Priority */}
+                          <button
+                            type="button"
+                            className="admin-action-btn-view"
+                            title="Manage Status & Priority"
+                            onClick={() => handleOpenEdit(ticket)}
+                          >
+                            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+                              <path
+                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </button>
+
+                          {/* 3. Clearly Visible Resolve Action */}
+                          <button
+                            type="button"
+                            className="admin-action-btn-resolve"
+                            title={
+                              isTicketResolved
+                                ? "Ticket is already resolved"
+                                : "Resolve Ticket with Note"
+                            }
+                            disabled={isTicketResolved}
+                            onClick={() => handleOpenResolve(ticket)}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                              <path
+                                d="M20 6L9 17L4 12"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -477,6 +619,36 @@ export const AllTicketsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Ticket Details Inspection Modal (Requirement 1 & 2) */}
+      <TicketDetailsModal
+        ticketId={detailsTicket?._id}
+        initialTicket={detailsTicket}
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setDetailsTicket(null);
+        }}
+        onOpenResolve={(ticket) => {
+          setIsDetailsModalOpen(false);
+          handleOpenResolve(ticket);
+        }}
+        onOpenEdit={(ticket) => {
+          setIsDetailsModalOpen(false);
+          handleOpenEdit(ticket);
+        }}
+      />
+
+      {/* Resolve Ticket Modal (Requirement 2, 3, 4, 9, 10 - Matching Screenshot) */}
+      <ResolveTicketModal
+        ticket={resolvingTicket}
+        isOpen={isResolveModalOpen}
+        onClose={() => {
+          setIsResolveModalOpen(false);
+          setResolvingTicket(null);
+        }}
+        onResolveSuccess={handleExecuteResolve}
+      />
     </div>
   );
 };
