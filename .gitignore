@@ -1,17 +1,32 @@
 # Dependencies
 node_modules/
+**/node_modules/
 package-lock.json
 yarn.lock
 
 # Environment variables (NEVER commit these)
+# .env.example and .env.*.example are tracked for reference
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example
 
 # Build outputs
 dist/
+**/dist/
 build/
+**/build/
 .next/
+
+# Salesforce metadata (unrelated to project)
+.sf/
+
+# Test outputs and coverage
+server/test-results.txt
+server/test_output_full.txt
+server/test_final.txt
+coverage/
+**/coverage/
 
 # IDE and editor files
 .vscode/
@@ -19,8 +34,10 @@ build/
 *.swp
 *.swo
 *~
-.DS_Store
-Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
 
 # Logs
 logs/
@@ -28,6 +45,7 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # OS-generated files
 .DS_Store
@@ -36,3 +54,5 @@ yarn-error.log*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+desktop.ini
+Thumbs.db
