@@ -371,6 +371,7 @@ export const MyTicketsPage = () => {
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
+              onPageChange={(p) => setCurrentPage(p)}
               onPreviousPage={() => setCurrentPage((p) => Math.max(1, p - 1))}
               onNextPage={() =>
                 setCurrentPage((p) => Math.min(totalPages, p + 1))

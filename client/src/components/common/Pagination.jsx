@@ -1,8 +1,8 @@
 import { sharedStyles } from "../../styles/sharedStyles";
 
 export const Pagination = ({
-  currentPage,
-  totalPages,
+  currentPage = 1,
+  totalPages = 1,
   onPageChange,
   onPreviousPage,
   onNextPage,
@@ -11,10 +11,12 @@ export const Pagination = ({
 
   const goToPage = (page) => {
     const safePage = Math.max(1, Math.min(totalPages, page));
+    if (safePage === currentPage) return;
 
     if (onPageChange) {
       onPageChange(safePage);
-    } else if (safePage < currentPage && onPreviousPage) {
+    }
+    if (safePage < currentPage && onPreviousPage) {
       onPreviousPage();
     } else if (safePage > currentPage && onNextPage) {
       onNextPage();

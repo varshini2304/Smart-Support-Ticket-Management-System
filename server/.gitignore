@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs and test outputs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+test-results.txt
+test-output.log
+test_output_full.txt
+test_final.txt
+
+# Coverage
+coverage/
+
+# OS and Editor
+.DS_Store
+.idea/
+.vscode/
